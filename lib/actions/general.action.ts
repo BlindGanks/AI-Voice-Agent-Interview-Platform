@@ -12,6 +12,8 @@ export async function getInterviewByUserId(userId: string): Promise<Interview[] 
         .orderBy("createdAt", "desc")
         .get();
 
+    if (interviews.empty) return null;
+
     return interviews.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -29,6 +31,8 @@ export async function getLatestInterviews(params: GetLatestInterviewsParams): Pr
         .limit(20)
         .get();
 
+    if (interviews.empty) return null;
+
     return interviews.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -38,7 +42,9 @@ export async function getLatestInterviews(params: GetLatestInterviewsParams): Pr
 export async function getInterviewById(id: string): Promise<Interview | null> {
     const interview = await db.collection("interviews").doc(id).get();
 
-    return interview.data() as Interview | null;
+    if (!interview.exists) return null;
+
+    return interview.data() as Interview;
 }
 
 export async function createFeedback(params: CreateFeedbackParams) {
@@ -103,7 +109,7 @@ export async function getFeedbackByInterviewId(params: GetFeedbackByInterviewIdP
         .limit(1)
         .get();
 
-    if (!feedback.empty) return null;
+    if (feedback.empty) return null;
 
     const feedbackDoc = feedback.docs[0];
 
