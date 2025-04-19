@@ -85,15 +85,9 @@ export async function getCurrentUser(): Promise<User | null> {
     if (!sessionCookie) return null;
 
     try {
-        const decodedClaims = await auth.verifySessionCookie(
-            sessionCookie,
-            true
-        );
+        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
 
-        const userRecord = await db
-            .collection("users")
-            .doc(decodedClaims.uid)
-            .get();
+        const userRecord = await db.collection("users").doc(decodedClaims.uid).get();
 
         if (!userRecord.exists) return null;
 
@@ -111,4 +105,34 @@ export async function isAuthenticated() {
     const user = await getCurrentUser();
 
     return !!user;
+}
+
+export async function getInterviewByUserId(userId: string): Promise<Interview[] | null> {
+    const interviws = await db
+        .collection("interviews")
+        .where("userId", "==", userId)
+        .orderBy("createdAt", "desc")
+        .get();
+
+    return interviws.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+    })) as Interview[];
+}
+
+export async function getLatestInterviews(params: GetLatestInterviewsParams): Promise<Interview[] | null> {
+    const { userId, limit = 20 } = params;
+
+    const interviws = await db
+        .collection("interviews")
+        .where("finalized", "==", true)
+        .where("userId", "!=", userId)
+        .orderBy("createdAt", "desc")
+        .limit(20)
+        .get();
+
+    return interviws.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+    })) as Interview[];
 }
