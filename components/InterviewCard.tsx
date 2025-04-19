@@ -5,19 +5,10 @@ import Link from "next/link";
 import { getRandomInterviewCover } from "@/lib/utils";
 import DisplayTechIcons from "./DisplayTechIcons";
 
-const InterviewCard = ({
-    interviewId,
-    userId,
-    role,
-    type,
-    techstack,
-    createdAt,
-}: InterviewCardProps) => {
+const InterviewCard = ({ id, userId, role, type, techstack, createdAt }: InterviewCardProps) => {
     const feedback = null as Feedback | null;
     const normalizedType = /mix/gi.test(type) ? "Mixed" : type;
-    const formattedDate = dayjs(
-        feedback?.createdAt || createdAt || Date.now()
-    ).format("MMM D, YYYY");
+    const formattedDate = dayjs(feedback?.createdAt || createdAt || Date.now()).format("MMM D, YYYY");
     return (
         <div className="card-border w-[360px] max-sm:w-full min-h-96">
             <div className="card-interview">
@@ -37,22 +28,12 @@ const InterviewCard = ({
 
                     <div className="flex flex-row gap-5 mt-3">
                         <div className="flex flex-row gap-2">
-                            <Image
-                                src="/calendar.svg"
-                                alt="calendar"
-                                height={22}
-                                width={22}
-                            />
+                            <Image src="/calendar.svg" alt="calendar" height={22} width={22} />
                             <p>{formattedDate}</p>
                         </div>
 
                         <div className="flex flex-row gap-2 items-center">
-                            <Image
-                                src="/star.svg"
-                                alt="star"
-                                width={22}
-                                height={22}
-                            />
+                            <Image src="/star.svg" alt="star" width={22} height={22} />
                             <p>{feedback?.totalScore || "---"}/100</p>
                         </div>
                     </div>
@@ -66,13 +47,7 @@ const InterviewCard = ({
                     <DisplayTechIcons techStack={techstack} />
 
                     <Button className="btn-primary">
-                        <Link
-                            href={
-                                feedback
-                                    ? `/interview/${interviewId}/feedback`
-                                    : `/interview/${interviewId}`
-                            }
-                        >
+                        <Link href={feedback ? `/interview/${id}/feedback` : `/interview/${id}`}>
                             {feedback ? "Check Feedback" : "View Interview"}
                         </Link>
                     </Button>
